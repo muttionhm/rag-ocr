@@ -101,11 +101,12 @@ class Robot:
   def __init__(self):
     self.rag_chain = None
   def vec_doc(self,input_x):
-    doc = layoo(input_x)
-    print('**************')
-    print(doc[:200])
-    split = text_splitter.split_text(doc)
-    split = [doc_pac(i) for i in split]
+    main_doc = []
+    for i in input_x:
+      doc = layoo(str(i))
+      split = text_splitter.split_text(doc)
+      main_doc.extend(split)
+    split = [doc_pac(i) for i in main_doc]
     vectordb = Chroma.from_documents(
     documents=split,
     embedding=embedding,
