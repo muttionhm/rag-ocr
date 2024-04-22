@@ -1,16 +1,16 @@
 import os
 from PIL import Image
 import cv2
-import fitz # PyMuPDF
-import layoutparser as lp
 import pytesseract
 from pdf2image import convert_from_path
-
+import time
 def layoo(pdf_path):
+
   pdf = convert_from_path(pdf_path, dpi=300)
-  Num = len(pdf)
+  start = time.time()
   # print(len(pdf))
   result = []
+
   # # 加载模型
   # model = lp.models.Detectron2LayoutModel(
   # "lp://PubLayNet/mask_rcnn_X_101_32x8d_FPN_3x/config",
@@ -42,5 +42,9 @@ def layoo(pdf_path):
     #                       .crop_image(image_1))
     text = pytesseract.image_to_string(pdf[page_num], lang='chi_sim+eng+spa')
     result.append(text)
+  end = time.time()
+  Num = len(pdf)
+  dura = end-start
+  print('the time is',dura)
   m_result = ''.join(result)
   return m_result
