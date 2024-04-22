@@ -1,11 +1,6 @@
 !pip install gradio
-!pip install 'git+https://github.com/facebookresearch/detectron2.git@v0.4#egg=detectron2'
-!pip install PyMuPDF Pillow
-!pip install layoutparser
-!pip install "layoutparser[ocr]"
-!pip install easyocr
+!pip install Pillow
 !pip install langchain
-!pip install pypdf
 !pip install Chroma
 !pip install chromadb
 !pip install bitsandbytes
@@ -16,3 +11,4 @@
 !sudo apt install tesseract-ocr
 !sudo apt-get install tesseract-ocr-chi-sim
 !apt-get install poppler-utils
+!pip install pdf2image
