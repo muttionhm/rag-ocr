@@ -7,9 +7,11 @@ import time
 import threading
 import PyPDF2
 from PIL import Image
+import subprocess
+import docx
 Image.MAX_IMAGE_PIXELS = 3300000000
 
-def layoo(pdf_path):
+def pdf_process(pdf_path):
   result = []
   data_ocr = {}
   pdf_path = pdf_path
@@ -24,7 +26,7 @@ def layoo(pdf_path):
     else:
       data_ocr[i] = temp_text
 
-
+  print(len(bad_count))
 
   def ocr_thread(file, id):
     # 使用Pillow打开图像
@@ -60,3 +62,29 @@ def layoo(pdf_path):
     result.append(data_ocr[i])
   m_result = ''.join(result)
   return m_result
+
+def convert_doc_to_docx(doc_path, docx_path):
+    # 使用LibreOffice的soffice命令进行转换
+    subprocess.run([
+        'soffice',
+        '--headless',
+        '--convert-to',
+        'docx',
+        doc_path,
+        '--outdir',
+        os.path.dirname(docx_path)
+    ])
+
+def doc_process(doc_path):
+  if doc_path.endswith('.doc'):
+          # 转换文件
+      doc_path = doc_path
+      docx_path = ''
+      convert_doc_to_docx(doc_path, docx_path)
+      docx_file = doc_path[:-4]+'.docx'
+  else:
+    doc = docx.Document(doc_path) 
+    text = [i.text for i in doc.paragraphs]
+    return (''.join(text))
+
+
