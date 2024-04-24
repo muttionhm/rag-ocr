@@ -5,17 +5,27 @@ import pytesseract
 from pdf2image import convert_from_path
 import time
 import threading
+import PyPDF2
+from PIL import Image
+Image.MAX_IMAGE_PIXELS = 3300000000
+
 def layoo(pdf_path):
-  pdf = convert_from_path(pdf_path, thread_count=12,dpi=300)
-  print('finished pdf2image')
   result = []
   data_ocr = {}
+  pdf_path = pdf_path
+  pdf = convert_from_path(pdf_path, thread_count=12,dpi=200)
+  bad_count = []
+  for i in range(len(pdf)):
+    # temp_text=pdf_fast.pages[i].extract_text()
+    reader = PyPDF2.PdfReader(open(pdf_path,'rb'))
+    temp_text = reader.pages[i].extract_text()
+    if len(temp_text)<100:
+      bad_count.append(i)
+    else:
+      data_ocr[i] = temp_text
 
-  # # 加载模型
-  # model = lp.models.Detectron2LayoutModel(
-  # "lp://PubLayNet/mask_rcnn_X_101_32x8d_FPN_3x/config",
-  # extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.6],
-  # label_map={0:"Text", 1:"Title", 2:"List", 3:"Table", 4:"Figure"})
+
+
   def ocr_thread(file, id):
     # 使用Pillow打开图像
     # 使用pytesseract进行OCR
@@ -26,48 +36,28 @@ def layoo(pdf_path):
 
   start = time.time()
   threads = 2
-  process_num = len(pdf)//threads
+  process_num = len(bad_count)//threads
   for i in range(process_num):
     threadings = []
     for j in range(threads):
-      thread = threading.Thread(target=ocr_thread, args=(pdf[i*threads+j], i*threads+j))
+      thread = threading.Thread(target=ocr_thread, args=(pdf[bad_count[i*threads+j]], bad_count[i*threads+j]))
       threadings.append(thread)
       thread.start()
     for thread in threadings:
         thread.join()
 
-  if len(pdf)-process_num*threads>0:
+  if len(bad_count)-process_num*threads>0:
     threadings = []
     for j in range (len(pdf)-process_num*threads):
-      thread = threading.Thread(target=ocr_thread, args=(pdf[process_num*threads+j], process_num*threads+j))
+      thread = threading.Thread(target=ocr_thread, args=(pdf[bad_count[process_num*threads+j]], bad_count[process_num*threads+j]))
       threadings.append(thread)
       thread.start()
     for thread in threadings:
       thread.join()
 
-  #   page = pdf[page_num]
-  #   page.save(f'page_{page_num}.jpg')
-  #   image_1 = cv2.imread(f'page_{page_num}.jpg')
-  #   # 检测
-  #   layout = model.detect(image_1)
-  #   color_map = {
-  #     'text':   'red',
-  #     'title':  'blue',
-  #     'list':   'green',
-  #     'table':  'purple',
-  #     'figure': 'pink',
-  # }
-  # lp.draw_box(image_1,
-  #               [b.set(id=f'{b.type}/{b.score:.2f}') for b in layout],
-  #               color_map=color_map,
-  #               show_element_id=True, id_font_size=10,
-  #               id_text_background_color='grey',
-  #               id_text_color='white')
-    # text_blocks = lp.Layout([b for b in layout if b.type == 'Text']) # 循环浏览页面上的每个文本框。
-    # for block in text_blocks:
-    #   segment_image = (block
-    #                       .pad(left=5, right=5, top=5, bottom=5)
-    #                       .crop_image(image_1))
+  for i in range(len(pdf)):
+    text = pytesseract.image_to_string(pdf[i], lang='chi_sim+eng')
+    data_ocr[i] = text
   for i in range(len(pdf)):
     result.append(data_ocr[i])
   m_result = ''.join(result)
