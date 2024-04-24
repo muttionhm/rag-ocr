@@ -12,3 +12,4 @@
 !sudo apt-get install tesseract-ocr-chi-sim
 !apt-get install poppler-utils
 !pip install pdf2image
+!pip install PyPDF2
