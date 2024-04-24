@@ -15,3 +15,9 @@
 !pip install PyPDF2
 !pip install python-docx
 !sudo apt-get install libreoffice
+!pip install --upgrade layoutparser
+!sudo apt-get install poppler-utils
+!sudo apt install tesseract-ocr
+!sudo apt-get install tesseract-ocr-chi-sim
+!pip install "layoutparser[ocr]"
+!pip install 'git+https://github.com/facebookresearch/detectron2.git@v0.4#egg=detectron2'
