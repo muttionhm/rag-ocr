@@ -13,12 +13,17 @@ def get_file_name(file_path):
 
 def get_file_names(files_path):
   temp = [str(i) for i in files_path]
-  return ';'.join([get_file_name[i] for i in temp])
+  return ';'.join([get_file_name(i) for i in temp])
 
 def process_inputs(input_file, chat_input):
+    global eve_files
     outputs = ["", ""]
+    print(eve_files)
+    print(get_file_names(input_file))
+    print('***********')
     if input_file is not None:  # 处理文件上传
       if get_file_names(input_file)!=eve_files:
+        print('in')
         eve_files = get_file_names(input_file)
         robot.vec_doc(input_file)
         outputs[0] = f"你上传的文件内容是：\n{str(input_file)}"
