@@ -13,3 +13,5 @@
 !apt-get install poppler-utils
 !pip install pdf2image
 !pip install PyPDF2
+!pip install python-docx
+!sudo apt-get install libreoffice
