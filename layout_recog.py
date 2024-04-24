@@ -48,16 +48,14 @@ def layoo(pdf_path):
 
   if len(bad_count)-process_num*threads>0:
     threadings = []
-    for j in range (len(pdf)-process_num*threads):
+    for j in range (len(bad_count)-process_num*threads):
       thread = threading.Thread(target=ocr_thread, args=(pdf[bad_count[process_num*threads+j]], bad_count[process_num*threads+j]))
       threadings.append(thread)
       thread.start()
     for thread in threadings:
       thread.join()
 
-  for i in range(len(pdf)):
-    text = pytesseract.image_to_string(pdf[i], lang='chi_sim+eng')
-    data_ocr[i] = text
+
   for i in range(len(pdf)):
     result.append(data_ocr[i])
   m_result = ''.join(result)
