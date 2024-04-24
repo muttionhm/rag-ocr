@@ -44,7 +44,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain.prompts import PromptTemplate
 from langchain.embeddings import HuggingFaceEmbeddings #使用不同的word2vec需要指定——sentence_transformer
 
-from layout_recog import layoo
+from layout_recog import pdf_process,doc_process
 from langchain.embeddings.openai import OpenAIEmbeddings
 embedding = HuggingFaceEmbeddings(
     model_name="thenlper/gte-large",
@@ -97,21 +97,36 @@ def doc_pac(x):
   return doc
 
 llm_chain = LLMChain(llm=llm, prompt=prompt)
+doc_mem = []
+def get_file(input_file):
+  temp_list = input_file.split('/')
+  return temp_list[-1]
+
 class Robot:
   def __init__(self):
     self.rag_chain = None
   def vec_doc(self,input_x):
     main_doc = []
     for i in input_x:
-      doc = layoo(str(i))
-      split = text_splitter.split_text(doc)
-      main_doc.extend(split)
+      if str(i).endswith('.pdf'):
+        doc = pdf_process(str(i))
+        split = text_splitter.split_text(doc)
+        main_doc.extend(split)
+      elif str(i).endswith('.doc') or str(i).endswith('.docx'):
+        doc = doc_process(str(i))
+        split = text_splitter.split_text(doc)
+        main_doc.extend(split)
+      else:
+        continue
     split = [doc_pac(i) for i in main_doc]
-    vectordb = Chroma.from_documents(
-    documents=split,
-    embedding=embedding,
-    )
-    retriever = vectordb.as_retriever()
+    if split:
+      vectordb = Chroma.from_documents(
+      documents=split,
+      embedding=embedding,
+      )
+      retriever = vectordb.as_retriever()
+    else:
+      retriever = {}
     self.rag_chain = ( 
  {"context": retriever, "question": RunnablePassthrough()}
     | llm_chain
