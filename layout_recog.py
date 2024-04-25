@@ -82,9 +82,13 @@ def doc_process(doc_path):
       docx_path = ''
       convert_doc_to_docx(doc_path, docx_path)
       docx_file = doc_path[:-4]+'.docx'
+      docx_file = docx_file.split('/')[-1]
+      print(docx_file)
+      doc = docx.Document(docx_file)
+      text = [i.text for i in doc.paragraphs]
+      return (''.join(text))
   else:
     doc = docx.Document(doc_path) 
     text = [i.text for i in doc.paragraphs]
     return (''.join(text))
-
 
