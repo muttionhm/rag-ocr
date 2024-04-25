@@ -1,4 +1,5 @@
 !pip install gradio
+!pip install PyMuPDF
 !pip install Pillow
 !pip install langchain
 !pip install Chroma
