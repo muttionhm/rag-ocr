@@ -66,7 +66,7 @@ pipeline = pipeline(
     model=model,
     tokenizer=tokenizer,
     return_full_text=True,
-    max_new_tokens=200
+    max_new_tokens=300
     # generation_config = Generation_config
 )
 
