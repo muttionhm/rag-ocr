@@ -2,7 +2,7 @@ import locale
 def getpreferredencoding(do_setlocale = True): 
  return "UTF-8" 
 
-
+from langchain.retrievers import BM25Retriever, EnsembleRetriever
 from transformers import AutoConfig,AutoTokenizer,BitsAndBytesConfig,AutoModelForCausalLM,pipeline
 from langchain import HuggingFacePipeline
 import torch
@@ -124,11 +124,17 @@ class Robot:
       documents=split,
       embedding=embedding,
       )
-      retriever = vectordb.as_retriever()
+      vec_retriever = vectordb.as_retriever(search_kwargs={"k": 2})
+      bm25_retriever = BM25Retriever.documents(documents=split,
+      embedding=embedding,)
+      bm25_retriever.k = 2
+      ensemble_retriever = EnsembleRetriever(
+    retrievers=[bm25_retriever, faiss_retriever], weights=[0.5, 0.5]
+)
     else:
-      retriever = {}
+      ensemble_retriever
     self.rag_chain = ( 
- {"context": retriever, "question": RunnablePassthrough()}
+ {"context": ensemble_retriever, "question": RunnablePassthrough()}
     | llm_chain
 )
   def chat(self,input):
