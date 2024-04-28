@@ -76,8 +76,7 @@ llm = HuggingFacePipeline(
 
 prompt_template = """
 ### [INST] 
-Instruction: 根据你的了解和下面背景来回答这个问题，如果背景不相关你可以忽略。
-这里有一些背景可以帮助你:
+Instruction: 必须根据下面背景来回答这个问题:
 ​
 {context}
 ​
@@ -125,14 +124,14 @@ class Robot:
       embedding=embedding,
       )
       vec_retriever = vectordb.as_retriever(search_kwargs={"k": 2})
-      bm25_retriever = BM25Retriever.documents(documents=split,
+      bm25_retriever = BM25Retriever.from_documents(documents=split,
       embedding=embedding,)
       bm25_retriever.k = 2
       ensemble_retriever = EnsembleRetriever(
-    retrievers=[bm25_retriever, faiss_retriever], weights=[0.5, 0.5]
-)
+    retrievers=[bm25_retriever, vec_retriever], weights=[0.9, 0.1])
+ 
     else:
-      ensemble_retriever
+      ensemble_retriever = {}
     self.rag_chain = ( 
  {"context": ensemble_retriever, "question": RunnablePassthrough()}
     | llm_chain
